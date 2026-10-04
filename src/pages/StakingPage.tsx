@@ -222,10 +222,6 @@ const StakingPage = () => {
     <div className="pb-28">
       <SpotlightHero title="StarMine Staking">
         <div className="px-5 pt-4">
-          <motion.section
-            className="mb-4 rounded-3xl border border-white/15 bg-black/30 p-4 backdrop-blur-xl"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
 
           <section className="mb-5">
             <div className="mb-3 flex items-end justify-between gap-3">
