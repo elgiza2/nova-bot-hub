@@ -226,35 +226,6 @@ const StakingPage = () => {
             className="mb-4 rounded-3xl border border-white/15 bg-black/30 p-4 backdrop-blur-xl"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.28, ease }}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.28em] text-white/55">TON market</p>
-                <p className="mt-1 text-sm font-semibold text-white">Live prices from CoinGecko</p>
-              </div>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {[
-                ["the-open-network", "TON"],
-                ["tether", "USDT"],
-              ].map(([id, name]) => {
-                const market = markets[id];
-                return (
-                  <div key={id} className="flex items-center gap-2 rounded-2xl bg-white/10 p-2.5">
-                    <img src={market?.image} alt="" className="h-7 w-7 rounded-full" />
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold text-white">{name}</p>
-                      <p className="text-[11px] text-white/60">{formatUsd(market?.price ?? 0)}</p>
-                    </div>
-                    <span className={`ml-auto text-[10px] ${Number(market?.change24h ?? 0) >= 0 ? "text-emerald-300" : "text-rose-300"}`}>
-                      {Number(market?.change24h ?? 0).toFixed(2)}%
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </motion.section>
 
           <section className="mb-5">
             <div className="mb-3 flex items-end justify-between gap-3">

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import webmVideo from "@/assets/bg-loop.webm.asset.json";
+import bgVideo from "@/assets/app-bg.mp4.asset.json";
 
 /** Global fullscreen video background shared by every page (dark hero style). */
 const StarryBackground = () => {
@@ -33,13 +33,11 @@ const StarryBackground = () => {
         loop
         muted
         playsInline
-        poster="/images/bg-poster.jpg"
         preload="auto"
         disablePictureInPicture
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="/bg-loop.mp4" type="video/mp4" />
-        <source src={webmVideo.url} type="video/webm" />
+        <source src={bgVideo.url} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-background/20" />
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
