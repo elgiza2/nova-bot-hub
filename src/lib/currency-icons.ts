@@ -1,3 +1,1 @@
-import gramIcon from "@/assets/gram.png.asset.json";
-
-export const GRAM_ICON = gramIcon.url;
+export const GRAM_ICON = "/images/gram.png";
