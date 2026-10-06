@@ -82,7 +82,7 @@ export interface AdminDashboard {
   };
 }
 
-const callRpc = async <T>(fn: string, params?: RpcParams): Promise<T> => {
+export const callRpc = async <T>(fn: string, params?: RpcParams): Promise<T> => {
   const { data, error } = await (supabase as any).rpc(fn, params ?? {});
   if (error) throw error;
   return data as T;

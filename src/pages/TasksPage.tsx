@@ -10,6 +10,7 @@ import SpotlightHero from "@/components/hero/SpotlightHero";
 import { swr } from "@/lib/cache";
 import { artForTask } from "@/lib/task-art";
 import AdsGramRewardCard from "@/components/AdsGramRewardCard";
+import AdClickRewardCard from "@/components/AdClickRewardCard";
 
 interface Task {
   id: string;
@@ -178,6 +179,7 @@ const TasksPage = () => {
         </TabsList>
 
         <TabsContent value="tasks">
+          <AdClickRewardCard />
           <AdsGramRewardCard />
           {loading ? (
             <div className="text-center text-muted-foreground py-8 animate-pulse">Loading tasks...</div>
