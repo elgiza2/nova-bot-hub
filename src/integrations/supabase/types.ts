@@ -808,6 +808,7 @@ export type Database = {
           siri_reward: number
           started_at: string
           ton_reward: number
+          updated_at: string
           usdt_reward: number
           user_id: string
         }
@@ -820,6 +821,7 @@ export type Database = {
           siri_reward?: number
           started_at?: string
           ton_reward?: number
+          updated_at?: string
           usdt_reward?: number
           user_id: string
         }
@@ -832,6 +834,7 @@ export type Database = {
           siri_reward?: number
           started_at?: string
           ton_reward?: number
+          updated_at?: string
           usdt_reward?: number
           user_id?: string
         }
