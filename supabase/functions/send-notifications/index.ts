@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
   // Fetch pending notifications (large batch, parallel send)
   const { data: notifications, error: fetchErr } = await supabase
     .from("telegram_notifications")
-    .select("id, profile_id, title, message, notification_type")
+    .select("id, profile_id, title, message, notification_type, metadata")
     .eq("status", "pending")
     .lte("scheduled_for", new Date().toISOString())
     .order("created_at", { ascending: true })
@@ -81,11 +81,21 @@ Deno.serve(async (req) => {
       }
       try {
         const text = `<b>${notif.title}</b>\n\n${notif.message}`;
-        const res = await fetch(`${BASE_URL}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: telegramId, text, parse_mode: "HTML" }),
-        });
+        const photo = notif.metadata?.photo_url;
+        const button = notif.metadata?.button_url
+          ? { reply_markup: { inline_keyboard: [[{ text: notif.metadata.button_text || "Open App", url: notif.metadata.button_url }]] } }
+          : {};
+        const res = photo
+          ? await fetch(`${BASE_URL}/sendPhoto`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ chat_id: telegramId, photo, caption: text, parse_mode: "HTML", ...button }),
+            })
+          : await fetch(`${BASE_URL}/sendMessage`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ chat_id: telegramId, text, parse_mode: "HTML", ...button }),
+            });
         const result = await res.json();
         if (result.ok) {
           sentIds.push(notif.id);
