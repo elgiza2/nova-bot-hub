@@ -16,26 +16,32 @@ export type Database = {
     Tables: {
       ad_watch_progress: {
         Row: {
+          ads_clicked_c: number
           ads_watched: number
           ads_watched_b: number
           total_claims: number
           total_claims_b: number
+          total_claims_c: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          ads_clicked_c?: number
           ads_watched?: number
           ads_watched_b?: number
           total_claims?: number
           total_claims_b?: number
+          total_claims_c?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          ads_clicked_c?: number
           ads_watched?: number
           ads_watched_b?: number
           total_claims?: number
           total_claims_b?: number
+          total_claims_c?: number
           updated_at?: string
           user_id?: string
         }
@@ -2336,6 +2342,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ad_click_claim: { Args: { _telegram_id: number }; Returns: Json }
+      ad_click_get_progress: { Args: { _telegram_id: number }; Returns: Json }
+      ad_click_increment: { Args: { _telegram_id: number }; Returns: Json }
       ad_watch_claim:
         | { Args: { _telegram_id: number }; Returns: Json }
         | { Args: { _telegram_id: number; _tier?: string }; Returns: Json }
