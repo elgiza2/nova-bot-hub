@@ -25,3 +25,5 @@
 - [x] Undo browser-only landing; dark video + glass style applied to every page in the app
 - [x] New bot token (TELEGRAM_BOT_TOKEN_SS) + webhook set; /start and /101 admin live
 - [x] Daily post: new AI astronaut/dark-planet image every day (14 rotating scenes); first post sent (msg 332)
+- [ ] Fix mining not crediting coins
+- [ ] Admin panel / start message stopped
