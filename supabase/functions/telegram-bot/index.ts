@@ -695,29 +695,44 @@ const ASTRO_SCENES = [
   "an astronaut jumping in low gravity over craters on a dark grey moon with stars",
   "an astronaut launching a small rocket from a dark planet surface toward a purple galaxy",
 ];
-async function generateDailyImage(supabase: any, title: string, scene: string, today: string): Promise<string | null> {
+const BACKDROPS = [
+  "a frozen ice planet with blue auroras", "a neon cyberpunk city on Mars at night", "a golden desert planet at sunset with three suns",
+  "a lush alien jungle with glowing plants", "an ocean planet with giant waves and floating islands", "inside a glowing crypto mining data center in orbit",
+  "a floating sky city above pink clouds", "a volcanic world with rivers of lava", "a crystal canyon reflecting rainbow light",
+  "a retro synthwave grid landscape", "a busy futuristic space port with ships", "a peaceful moon garden with cherry blossom trees",
+  "a stormy gas giant with lightning", "an underwater alien city", "a snowy mountain observatory under the milky way",
+];
+const ACTIONS = [
+  "skateboarding down a ramp", "playing electric guitar on stage", "lifting a giant golden coin over their head", "fishing from a floating rock",
+  "racing a hoverbike", "dancing with a robot", "cooking space noodles", "reading a holographic chart that goes up", "parachuting with a glowing parachute",
+  "painting a mural of a coin", "meditating while coins orbit around", "playing chess against an alien", "surfing a giant wave", "driving a monster truck rover",
+  "taking a selfie with a friendly alien", "fighting a dragon made of light", "building a robot", "shooting a basketball through a ring of fire",
+];
+const STYLES = ["cinematic 3D render", "vibrant Pixar-like 3D", "glossy anime illustration", "painterly concept art", "bold comic book art", "soft clay 3D"];
+const pickOne = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+async function generateDailyImage(supabase: any, title: string, _scene: string, today: string): Promise<string | null> {
   const key = Deno.env.get("LOVABLE_API_KEY");
   if (!key) return null;
   try {
-    const prompt = `Cinematic 16:9 poster, dark cosmic scene: ${scene}. Dark planets, deep purple and navy space, soft rim lighting, high detail 3D render style. On the left side, large clean bold white sans-serif text that reads exactly "${title}" and below it smaller text "NOVA". No other text, no emojis, no icons, no logos, no watermark.`;
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const scene = `an astronaut ${pickOne(ACTIONS)}, in ${pickOne(BACKDROPS)}`;
+    const prompt = `Wide 3:2 poster, ${pickOne(STYLES)}: ${scene}. Fresh unique composition, rich colors, dramatic lighting. On the left side, large clean bold white sans-serif text that reads exactly "${title}" and below it smaller text "NOVA". No other text, no logos, no watermark.`;
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "google/gemini-2.5-flash-image-preview", messages: [{ role: "user", content: prompt }], modalities: ["image", "text"] }),
+      body: JSON.stringify({ model: "openai/gpt-image-2.5-sunburst", prompt, size: "1536x1024" }),
     });
-    if (!r.ok) return null;
+    if (!r.ok) { console.error("daily image failed", r.status, await r.text()); return null; }
     const j = await r.json();
-    const url: string | undefined = j?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!url?.startsWith("data:")) return null;
-    const [meta, b64] = url.split(",");
-    const mime = meta.slice(5).split(";")[0] || "image/png";
+    const b64: string | undefined = j?.data?.[0]?.b64_json;
+    if (!b64) return null;
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    const path = `channel-posts/daily-${today}-${Date.now()}.${mime.includes("jpeg") ? "jpg" : "png"}`;
-    const { error } = await supabase.storage.from("ads-tasks").upload(path, bytes, { contentType: mime, upsert: true });
+    const path = `channel-posts/daily-${today}-${Date.now()}.png`;
+    const { error } = await supabase.storage.from("ads-tasks").upload(path, bytes, { contentType: "image/png", upsert: true });
     if (error) return null;
     return supabase.storage.from("ads-tasks").getPublicUrl(path).data.publicUrl;
-  } catch { return null; }
+  } catch (e) { console.error("daily image error", e); return null; }
 }
+
 async function runChannelPost(supabase: any, BASE_URL: string, force = false) {
   const today = new Date().toISOString().slice(0, 10);
   if (!force) {
