@@ -1,7 +1,7 @@
 import { GRAM_ICON } from "@/lib/currency-icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Lock, TrendingUp } from "lucide-react";
+import { ArrowRight, Clock3, Coins, Loader2, Lock, ShieldCheck, TrendingUp } from "lucide-react";
 import SpotlightHero from "@/components/hero/SpotlightHero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -221,69 +221,65 @@ const StakingPage = () => {
   return (
     <div className="pb-28">
       <SpotlightHero title="StarMine Staking">
-        <div className="px-5 pt-4">
-
-          <section className="mb-5">
-            <div className="mb-3 flex items-end justify-between gap-3">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.28em] text-white/55">Capital desk</p>
-                <h2 className="mt-1 font-display text-2xl text-white">Large investment offers</h2>
-              </div>
-              <p className="max-w-[110px] text-right text-[10px] leading-relaxed text-white/55">From 100 gram · flexible lockups</p>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {[{ amount: "100", apr: "8.5%", term: "30D" }, { amount: "250", apr: "12%", term: "90D" }, { amount: "1K+", apr: "18%", term: "180D" }].map((offer) => (
-                <div key={offer.amount} className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-xl">
-                  <p className="text-[10px] uppercase tracking-widest text-emerald-300">{offer.term}</p>
-                  <p className="mt-2 font-display text-xl text-white">{offer.amount}</p>
-                  <p className="mt-1 text-[11px] text-white/60">gram</p>
-                  <p className="mt-3 text-xs font-semibold text-white">{offer.apr} APR</p>
-                </div>
-              ))}
-            </div>
-            <p className="mt-2 text-[10px] leading-relaxed text-white/45">Investments carry market and platform risk. Review each plan before locking funds.</p>
-          </section>
-          {/* Portfolio summary */}
+        <div className="px-5 pt-3">
           <motion.section
-            className="rounded-3xl border border-border bg-card/50 p-5 backdrop-blur-xl"
+            className="overflow-hidden rounded-3xl border border-border bg-card/70 backdrop-blur-xl"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28, ease }}
           >
-            <p className="text-center text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-              Total Locked
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="border-b border-border px-5 pb-4 pt-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Your portfolio</p>
+                  <h2 className="mt-1 text-2xl font-semibold text-foreground">Put your balance to work</h2>
+                  <p className="mt-1 max-w-[250px] text-xs leading-relaxed text-muted-foreground">Choose a fixed term, track rewards, and withdraw when your bond matures.</p>
+                </div>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                  <TrendingUp className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-4 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-primary" /> Fixed APR</span>
+                <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5 text-primary" /> Clear terms</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 divide-x divide-border">
               {(["ton", "siri"] as const).map((c) => (
-                <div key={c} className="rounded-2xl border border-border/70 bg-background/40 p-3.5">
-                  <div className="mb-1.5 flex items-center gap-2">
-                    <img src={icon(c)} alt={label(c)} className="h-4 w-4 rounded-full" loading="lazy" />
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label(c)}</p>
+                <div key={c} className="p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <img src={icon(c)} alt={label(c)} className="h-5 w-5 rounded-full" loading="lazy" />
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label(c)} locked</p>
                   </div>
-                  <p className="font-display text-xl font-bold text-foreground">
+                  <p className="text-xl font-bold text-foreground">
                     {fmt(totals.t[c], c === "ton" ? 4 : 2)}
                   </p>
-                  <p className="mt-1 text-[10px] text-muted-foreground">
-                    Pending {fmt(totals.pending[c], c === "ton" ? 4 : 2)}
+                  <p className="mt-1 text-[10px] text-primary">
+                    +{fmt(totals.pending[c], c === "ton" ? 4 : 2)} pending
                   </p>
                 </div>
               ))}
             </div>
           </motion.section>
 
-          {/* Segmented tabs */}
-          <div className="mt-5 grid grid-cols-2 gap-1 rounded-2xl border border-border bg-card/40 p-1">
-            {(["plans", "mine"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`rounded-xl py-2.5 font-display text-[11px] uppercase tracking-widest transition-all ${
-                  tab === t ? "action-black" : "text-muted-foreground"
-                }`}
-              >
-                {t === "plans" ? "Plans" : `My Bonds (${active.length})`}
-              </button>
-            ))}
+          <div className="mt-5 grid grid-cols-2 gap-1 rounded-full border border-border bg-card/60 p-1">
+            <Button
+              type="button"
+              variant={tab === "plans" ? "default" : "ghost"}
+              onClick={() => setTab("plans")}
+              className="h-10 rounded-full text-xs"
+            >
+              Plans
+            </Button>
+            <Button
+              type="button"
+              variant={tab === "mine" ? "default" : "ghost"}
+              onClick={() => setTab("mine")}
+              className="h-10 rounded-full text-xs"
+            >
+              My Bonds <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{active.length}</span>
+            </Button>
           </div>
 
           {loading ? (
@@ -291,50 +287,74 @@ const StakingPage = () => {
               <Loader2 className="h-4 w-4 animate-spin" /> Loading bonds…
             </div>
           ) : tab === "plans" ? (
-            <div className="mt-4 space-y-3">
+            <div className="mt-5 space-y-3">
+              <div className="flex items-end justify-between px-1">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Available now</p>
+                  <h3 className="mt-0.5 text-xl text-foreground">Choose a plan</h3>
+                </div>
+                <span className="text-[11px] text-muted-foreground">{plans.length} options</span>
+              </div>
               {plans.length === 0 && (
                 <p className="py-12 text-center text-sm text-muted-foreground">No plans available</p>
               )}
               {plans.map((p, i) => (
-                <motion.button
+                <motion.div
                   key={p.id}
-                  onClick={() => openPlan(p)}
-                  className="w-full rounded-2xl border border-border bg-card/40 p-4 text-left backdrop-blur-xl transition-all active:scale-[0.99] hover:border-primary/40"
+                  className="rounded-2xl border border-border bg-card/60 p-4 backdrop-blur-xl"
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.28, ease, delay: Math.min(i, 8) * 0.035 }}
                 >
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <img
                         src={icon(p.currency)}
                         alt={label(p.currency)}
-                        className="h-9 w-9 rounded-full border border-border"
+                        className="h-11 w-11 rounded-full border border-border"
                         loading="lazy"
                       />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-foreground">{p.name}</p>
+                        <p className="truncate text-[15px] font-semibold text-foreground">{p.name}</p>
                         <p className="mt-0.5 text-[11px] text-muted-foreground">
-                          {p.duration_days} days · min {fmt(p.min_amount, 2)} {label(p.currency)}
+                          Minimum {fmt(p.min_amount, 2)} {label(p.currency)}
                         </p>
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="font-display text-lg font-bold leading-none text-primary">
+                      <p className="text-xl font-bold leading-none text-primary">
                         {fmt(p.apr, 1)}%
                       </p>
-                      <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">APR</p>
+                      <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">APR</p>
                     </div>
                   </div>
-                </motion.button>
+                  <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Clock3 className="h-3.5 w-3.5" /> {p.duration_days} days
+                    </div>
+                    <Button type="button" size="sm" onClick={() => openPlan(p)} className="h-9 gap-1.5 px-4 text-xs">
+                      Stake now <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </motion.div>
               ))}
+              <p className="px-2 pt-1 text-[10px] leading-relaxed text-muted-foreground">Staking involves platform risk. Review the term and early-exit fee before locking funds.</p>
             </div>
           ) : (
-            <div className="mt-4 space-y-3">
+            <div className="mt-5 space-y-3">
+              <div className="flex items-end justify-between px-1">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Portfolio</p>
+                  <h3 className="mt-0.5 text-xl text-foreground">Your bonds</h3>
+                </div>
+                <span className="text-[11px] text-muted-foreground">{active.length} active</span>
+              </div>
               {stakes.length === 0 && (
-                <div className="py-14 text-center">
-                  <p className="font-display text-base text-foreground">No bonds yet</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Open a bond from the Plans tab</p>
+                <div className="rounded-2xl border border-dashed border-border bg-card/40 px-5 py-12 text-center">
+                  <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-primary/15 text-primary"><Coins className="h-5 w-5" /></div>
+                  <p className="mt-3 text-base font-semibold text-foreground">No bonds yet</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Choose a plan to start earning.</p>
+                  <Button type="button" size="sm" onClick={() => setTab("plans")} className="mt-4">View plans</Button>
                 </div>
               )}
               {stakes.map((s, i) => {
@@ -344,7 +364,7 @@ const StakingPage = () => {
                 return (
                   <motion.article
                     key={s.id}
-                    className="rounded-2xl border border-border bg-card/40 p-4 backdrop-blur-xl"
+                    className="rounded-2xl border border-border bg-card/60 p-4 backdrop-blur-xl"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.28, ease, delay: Math.min(i, 8) * 0.035 }}
@@ -459,13 +479,14 @@ const StakingPage = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Available</span>
-              <button
+              <Button
                 type="button"
+                variant="link"
                 onClick={() => setAmount(String(available))}
-                className="font-display text-foreground underline decoration-dotted"
+                className="h-auto p-0 text-xs text-primary"
               >
                 {fmt(available, 4)} {label(selected?.currency ?? "ton")}
-              </button>
+              </Button>
             </div>
             <Input
               type="number"
