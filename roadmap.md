@@ -1,7 +1,7 @@
 # Roadmap
 
 - [ ] Add transparent withdrawal requirements: 3 Gram verification, NFT purchase of at least 5 Gram, then 50 Gram deposit; complete sequentially
-- [ ] Create a clean multi-character arena welcome image and English message promoting staking and NFTs
+- [ ] Restyle the multi-character arena welcome image to match the dark purple astronaut reference; keep the English staking/NFT welcome message
 - [ ] Send the welcome broadcast to every current user and verify delivery totals
 - [x] Redesign the staking page for clearer balances, plans, and bond management
 - [x] Replace the Boinkers task image with the user-provided artwork
