@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Pin Pokergram and Boinkers directly below ad tasks; set each reward to 500 NOVA
+- [x] Pin Pokergram and Boinkers directly below ad tasks; set each reward to 500 NOVA
 
 - [x] Import project from GitHub (same backend)
 - [ ] Remove $7,777 prize box + zero reward balances for all users + stop re-granting (DB trigger/functions, bot, UI)
