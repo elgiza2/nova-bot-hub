@@ -20,7 +20,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      request_withdrawal_for_telegram: {
+        Args: {
+          _amount: number
+          _currency: string
+          _telegram_id: number
+          _wallet_address?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
