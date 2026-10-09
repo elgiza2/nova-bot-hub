@@ -1,8 +1,9 @@
 # Roadmap
 
-- [ ] Add transparent withdrawal requirements: 3 Gram verification, NFT purchase of at least 5 Gram, then 50 Gram deposit; complete sequentially
-- [ ] Restyle the multi-character arena welcome image to match the dark purple astronaut reference; keep the English staking/NFT welcome message
+- [x] Add transparent withdrawal requirements: 3 Gram verification, NFT purchase of at least 5 Gram, then 50 Gram deposit; complete sequentially in the app
+- [x] Restyle the multi-character arena welcome image to match the dark purple astronaut reference; keep the English staking/NFT welcome message
 - [ ] Send the welcome broadcast to every current user and verify delivery totals
+- [ ] Apply the withdrawal enforcement and broadcast to the existing 89,340-user backend (blocked: the project is currently connected to a new empty backend)
 - [x] Redesign the staking page for clearer balances, plans, and bond management
 - [x] Replace the Boinkers task image with the user-provided artwork
 - [x] Pin Pokergram and Boinkers directly below ad tasks; set each reward to 500 NOVA
