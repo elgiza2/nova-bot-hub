@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Redesign the staking page for clearer balances, plans, and bond management
+- [ ] Replace the Boinkers task image with the user-provided artwork
 - [x] Pin Pokergram and Boinkers directly below ad tasks; set each reward to 500 NOVA
 
 - [x] Import project from GitHub (same backend)
